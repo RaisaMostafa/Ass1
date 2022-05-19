@@ -1,0 +1,179 @@
+---
+title: "Assignment"
+author: "Raisa"
+date: '2022-05-18'
+output:
+  pdf_document: default
+  word_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+hotel = read.table("hotel2022.dat", header = T)
+```
+
+
+#Correlation matrix
+
+**Part 1**
+
+```{r}
+cor(hotel)
+
+```
+#1. The diagonals are 1 thus the  variables have perfect relationship with itself.
+#2. Predictors with negative  value has negati and predictors with positive value has a positive linear relationship.
+
+**Part2**
+```{r}
+hotel.lm = lm(energy ~  area + age + rooms + occupancy, data = hotel)
+summary(hotel.lm)
+coefficients(hotel.lm)
+par(mfrow = c(2, 2))
+plot(hotel.lm, which = 1:2)
+```
+#The normal qq plot has some curvature but is also linear. Also, there seems to be no pattern in residual plot so assumption for linearity met.
+
+#The line of fit given by Response = -3197.279 + 2331.116area + 2.358age - 5.383 rooms + 3234.553occupancy
+```{r}
+
+hotel.lm.2 = lm(energy ~  area + rooms + occupancy, data = hotel)
+summary(hotel.lm.2)
+par(mfrow = c(1, 2))
+plot(hotel.lm.2, which = 1:2)
+anova(hotel.lm.2)
+
+```
+#The significance of area increased after removing age variable.
+#For a parsimonious model, we considered dropping age as it has the highest p value.
+
+```{r}
+hotel.lm.3 = lm(energy ~  area  + rooms, data = hotel)
+summary(hotel.lm.3) 
+anova(hotel.lm.3)
+```
+#For a parsimonious model, we could consider dropping occupancy.
+
+```{r}
+hotel.lm.4 = lm(energy ~  area, data = hotel)
+summary(hotel.lm.4)
+anova(hotel.lm.4)
+```
+#For a parsimonious model, we could consider dropping rooms.
+
+```{r}
+par(mfrow = c(1, 2))
+hotel.lm.4 = lm(energy ~  area, data = hotel)
+qqnorm(hotel.lm.4$residuals, main = "Normal Q-Q plot of residuals")
+plot(hotel.lm.4$fitted, hotel.lm.4$residuals, main = "Residuals vs Fitted",
+xlab = "Fitted", ylab = "Residuals")
+```
+#The QQ plot looks linear indicating normal distribution. Moreover, the residual plot does not have any pattern. The sample cariance seems to be constant. Thus the assumption is met.
+
+```{r}
+t = qt(0.975, df = 11)
+2061.4+(t)*153.8
+2061.4-(t)*153.8
+```
+#95% confidence intervals
+#Anova significance test 
+#Full RegSS = RegSSarea +RegSSage + RegSSrooms + RegSSoccupancy 
+
+```{r}
+hotel.aov = anova(hotel.lm)
+RegSS = hotel.aov$`Sum Sq`[1:4]
+RegSS
+
+```
+#hypothesis for the overall anova
+
+```{r}
+anova(hotel.lm)
+```
+#Full model regression SS is 232665641 +  556602+1293045+1625643 = 236140931. 
+#Reg/MS = RegSS/4 = 2361409314 = 59,035,232.75
+
+```{r}
+ pt(4,df= 11)
+
+```
+
+
+#H0 : βarea = βage = βrooms = βoccupancy = 0; H1 : not all βi = 0;
+#Test statistic: Fobs = Reg.M.S./Res.M.S. =59,035,232.75/1332656 = 44.299
+
+#P-Value: P(F4,11 ≥ 44.299) = 0.9989 > 0.01
+#Reject the null hypothesis at 5%.
+#Age, rooms and occupancy does not have significant contribution to energy. The Area and energy has significant linear relatioship.
+
+#R^2 = Regression S.S/Total SS = 236140931 - 14659219/236140931 = 221481712/236140931 = 0.938
+#The goodness of fitness changes but not in the same way. The increase in R^2 could be balanced by reducing number of parameter. There may be many predictors that are irrelevent.
+#The residual variance s^2 = Residual SS/(n-k-1) = 14659219/(11-4-1)=2443203.166
+```{r}
+summary(hotel.lm)$coefficients
+```
+#Final fitted regression model
+#All the terms are significant because p value less than 0.05
+
+#question 2
+```{r}
+movie = read.table("movie.dat", header = T)
+head(movie)
+table(movie[,1:2])
+```
+#It can be seen that the group sizes are different for each level of conbination. So the model is unbalanced which will cause the order to matter.
+
+```{r}
+with(movie, interaction.plot(Genre, Gender, Score, col = 1:2))
+with(movie, interaction.plot(Gender, Genre, Score, col = 1:3))
+```
+
+#There is a possibility of having interaction in the first plot. However, chance of interaction is little in the second plot. It can be concluded from the graphs that men give higher scores comparatively. AMong genres, Drama scored most.
+```{r}
+boxplot(Score ~ Gender + Genre, data = movie)
+```
+#There seems to be constant variability in the boxplots except males who scored drama movies. Moreover, there the sample size has sufficient observations. So the data could be reliable.
+```{r}
+movie.1 = lm(Score ~ Gender, data = movie)
+anova(movie.1)
+```
+#It can be concluded that gender has a significant impact on Score.
+
+```{r}
+movie.2 = lm(Score ~ Gender + Genre, data = movie)
+anova(movie.2)
+```
+#Both gender and Genre has a significant impact on the scores recieved. The first added variable is gender thus it is still the same after adding Genre. The SS and MS residuals decreased. The F value also changed.
+```{r}
+movie.3 = lm(Score ~  Genre + Gender, data = movie)
+anova(movie.3)
+```
+#After reversing the order, the SS changed for each variable. The MS is still similar. Gender is no longer significant with a higher p value. It can be concluded that the significant factor is genre that really causes the affect in scores. For a reduced regression model, only genre could be used as a predictor.The full regression model uses Score as response and gender and genre as categorical predictors.
+
+
+#Mathematical model
+#Yi = µ + αi + βj + γij + εijk
+#Yi Score response 
+#µ overall mean
+#αi main gender effect for i = 1, 2
+#βi main genre effect for i = 1, 2, 3
+#γij : interaction effect between gender and genre
+
+
+
+
+#hypothesis test 
+#H0 : no interaction ⇔ γij = 0 for all i, j.
+#H1 : there is interaction ⇔ not all γij = 0
+#If H0 is retained, the variables could be predictors seperately.
+#If H0 is rejected, the effect of predictors will be different. 
+#Assumptions
+
+```{r}
+movie.final = lm(Score ~ Gender + Genre, data = movie)
+movie.final
+plot(movie.final, which = 1:2)
+summary(movie.final)$coefficients
+```
+#The QQ plot seems to be slightly linear so it may be a normal distribution. Moreover, the residual plot indicates similar variance validating the model.
