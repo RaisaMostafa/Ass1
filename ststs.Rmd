@@ -1,0 +1,117 @@
+---
+title: "Untitled"
+author: "ghadsf"
+date: '2022-05-19'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+hotel = read.table("hotel2022.dat", header = T)
+```
+
+
+#Correlation matrix
+
+**Part 1**
+
+```{r}
+cor(hotel)
+
+```
+#1. The diagonals are 1 thus the  variables have perfect relationship with itself.
+#2. Predictors with negative  value has negati and predictors with positive value has a positive linear relationship.
+
+**Part2**
+```{r}
+hotel.lm = lm(energy ~  area + age + rooms + occupancy, data = hotel)
+summary(hotel.lm)
+coefficients(hotel.lm)
+par(mfrow = c(2, 2))
+plot(hotel.lm, which = 1:2)
+```
+#The normal qq plot has some curvature but is also linear. Also, there seems to be no pattern in residual plot so assumption for linearity met.
+
+#The line of fit given by Response = -3197.279 + 2331.116area + 2.358age - 5.383 rooms + 3234.553occupancy
+```{r}
+
+hotel.lm.2 = lm(energy ~  area + rooms + occupancy, data = hotel)
+summary(hotel.lm.2)
+par(mfrow = c(1, 2))
+plot(hotel.lm.2, which = 1:2)
+anova(hotel.lm.2)
+
+```
+#The significance of area increased after removing age variable.
+#For a parsimonious model, we considered dropping age as it has the highest p value.
+
+```{r}
+hotel.lm.3 = lm(energy ~  area  + rooms, data = hotel)
+summary(hotel.lm.3) 
+anova(hotel.lm.3)
+```
+#For a parsimonious model, we could consider dropping occupancy.
+
+```{r}
+hotel.lm.4 = lm(energy ~  area, data = hotel)
+summary(hotel.lm.4)
+anova(hotel.lm.4)
+```
+#For a parsimonious model, we could consider dropping rooms.
+
+```{r}
+par(mfrow = c(1, 2))
+hotel.lm.4 = lm(energy ~  area, data = hotel)
+qqnorm(hotel.lm.4$residuals, main = "Normal Q-Q plot of residuals")
+plot(hotel.lm.4$fitted, hotel.lm.4$residuals, main = "Residuals vs Fitted",
+xlab = "Fitted", ylab = "Residuals")
+```
+#The QQ plot looks linear indicating normal distribution. Moreover, the residual plot does not have any pattern. The sample cariance seems to be constant. Thus the assumption is met.
+
+```{r}
+t = qt(0.975, df = 11)
+2061.4+(t)*153.8
+2061.4-(t)*153.8
+```
+#95% confidence intervals
+#Anova significance test 
+#Full RegSS = RegSSarea +RegSSage + RegSSrooms + RegSSoccupancy 
+
+```{r}
+hotel.aov = anova(hotel.lm)
+RegSS = hotel.aov$`Sum Sq`[1:4]
+RegSS
+
+```
+#hypothesis for the overall anova
+
+```{r}
+anova(hotel.lm)
+```
+#Full model regression SS is 232665641 +  556602+1293045+1625643 = 236140931. 
+#Reg/MS = RegSS/4 = 2361409314 = 59,035,232.75
+
+```{r}
+ pt(4,df= 11)
+```
+
+#question 2
+```{r}
+movie = read.table("movie.dat", header = T)
+head(movie)
+table(movie[,1:2])
+```
+#It can be seen that the group sizes are different for each level of conbination. So the model is unbalanced which will cause the order to matter.
+```{r}
+with(movie, interaction.plot(Genre, Gender, Score, col = 1:2))
+with(movie, interaction.plot(Gender, Genre, Score, col = 1:3))
+```
+#There is a possibility of having interaction in the first plot. However, chance of interaction is little in the second plot. It can be concluded from the graphs that men give higher scores comparatively. AMong genres, Drama scored most.
+```{r}
+boxplot(Score ~ Gender + Genre, data = movie)
+```
+#There seems to be constant variability in the boxplots except males who scored drama movies. Moreover, there the sample size has sufficient observations. So the data could be reliable.
+```{r}
+
+```
+
