@@ -26,6 +26,7 @@ cor(hotel)
 #2. Predictors with negative  value has negati and predictors with positive value has a positive linear relationship.
 
 **Part2**
+
 ```{r}
 hotel.lm = lm(energy ~  area + age + rooms + occupancy, data = hotel)
 summary(hotel.lm)
