@@ -30,7 +30,7 @@ coefficients(hotel.lm)
 par(mfrow = c(2, 2))
 plot(hotel.lm, which = 1:2)
 ```
-#The normal qq plot has some curvature but is also linear. Also, there seems to be no pattern in residual plot so assumption for linearity met.
+#The normal QQ plot has some curvature but is also linear. Also, there seems to be no pattern in residual plot so assumption for linearity met.
 
 #The line of fit given by Response = -3197.279 + 2331.116area + 2.358age - 5.383 rooms + 3234.553occupancy
 ```{r}
