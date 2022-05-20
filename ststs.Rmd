@@ -92,7 +92,7 @@ anova(hotel.lm)
 #Reg/MS = RegSS/4 = 2361409314 = 59,035,232.75
 
 ```{r}
- pt(4,df= 11)
+ pt(4,df= 11) 
 ```
 
 #question 2
